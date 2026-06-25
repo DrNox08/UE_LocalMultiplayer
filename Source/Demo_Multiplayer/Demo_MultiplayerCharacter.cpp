@@ -11,6 +11,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Demo_Multiplayer.h"
+#include "Kismet/GameplayStatics.h"
+#include "Public/Interactable.h"
 
 ADemo_MultiplayerCharacter::ADemo_MultiplayerCharacter()
 {
@@ -65,6 +67,9 @@ void ADemo_MultiplayerCharacter::SetupPlayerInputComponent(UInputComponent* Play
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ADemo_MultiplayerCharacter::Look);
+		
+		// Interacting
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ADemo_MultiplayerCharacter::StartInteract);
 	}
 	else
 	{
@@ -130,4 +135,34 @@ void ADemo_MultiplayerCharacter::DoJumpEnd()
 {
 	// signal the character to stop jumping
 	StopJumping();
+}
+
+void ADemo_MultiplayerCharacter::StartInteract()
+{
+	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("Interacted with actors within range.")), true, true, FLinearColor::Green, 2.0f);
+	UE_LOG(LogDemo_Multiplayer, Log, TEXT("Interacted with actors within range."));
+	
+	Server_Interact();
+}
+
+void ADemo_MultiplayerCharacter::Server_Interact_Implementation()
+{
+	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("Interacted with actors within range.")), true, true, FLinearColor::Green, 2.0f);
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsWithInterface(GetWorld(), UInteractable::StaticClass(), FoundActors);
+
+	for (AActor* Actor : FoundActors)
+	{
+		float Distance = FVector::Dist(GetActorLocation(), Actor->GetActorLocation());
+		if (Distance <= InteractionRange)
+		{
+			if (IInteractable* Interactable = Cast<IInteractable>(Actor))
+			{
+				Interactable->Interact(this);
+				break;
+			}
+		}
+	}
+	
+	//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("Interacted with %d actors within range."), FoundActors.Num()), true, true, FLinearColor::Green, 2.0f);
 }

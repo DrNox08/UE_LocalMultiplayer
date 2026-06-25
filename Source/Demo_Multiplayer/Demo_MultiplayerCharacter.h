@@ -48,6 +48,13 @@ protected:
 	/** Mouse Look Input Action */
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* MouseLookAction;
+	
+	// Interaction
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* InteractAction;
+	
+	UPROPERTY(EditAnywhere, Category="Interaction")
+	float InteractionRange = 200.f;
 
 public:
 
@@ -84,6 +91,11 @@ public:
 	/** Handles jump pressed inputs from either controls or UI interfaces */
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoJumpEnd();
+	
+	void StartInteract();
+
+	UFUNCTION(Server, Reliable)
+	void Server_Interact();
 
 public:
 
