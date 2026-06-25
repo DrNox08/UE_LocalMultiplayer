@@ -59,3 +59,18 @@ void ADemo_MultiplayerPlayerController::SetupInputComponent()
 		}
 	}
 }
+
+void ADemo_MultiplayerPlayerController::Client_ShowWinScreen_Implementation()
+{
+	if (WinWidgetInstance) return;
+	if (!WinWidgetClass) return;
+
+	WinWidgetInstance = CreateWidget<UUserWidget>(this, WinWidgetClass);
+	if (WinWidgetInstance)
+	{
+		WinWidgetInstance->AddToViewport();
+		SetShowMouseCursor(true);
+		SetInputMode(FInputModeUIOnly());
+		SetPause(true);
+	}
+}

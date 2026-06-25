@@ -40,5 +40,19 @@ protected:
 
 	/** Input mapping context setup */
 	virtual void SetupInputComponent() override;
+	
+public:
+	
+	UFUNCTION(Client, Reliable)
+	void Client_ShowWinScreen();
+	
+protected:
+	
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> WinWidgetClass;
+	
+private:
+	UPROPERTY()
+	UUserWidget* WinWidgetInstance;
 
 };
